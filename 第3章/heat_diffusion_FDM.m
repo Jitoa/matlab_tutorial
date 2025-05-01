@@ -1,0 +1,30 @@
+function approxSol = heat_diffusion_FDM(N, tEnd, r)
+
+    h = 1/32;   %xの隣との距離
+    x = h:h:1-h;               % 内部点の空間格子
+    yVec = sin(pi * x);         % 初期条件 (sin(pi*x))
+    dt = r * h^2;               % 時間刻み幅
+    numSteps = round(tEnd / dt); % ステップ数
+
+    % 時間発展
+    for n = 1:numSteps
+        yNewVec = zeros(size(yVec));  % 次の時刻のベクトルを初期化
+
+        % 左端（内部点の最初）i=1
+        yNewVec(1) = yVec(1) + r * (-2 * yVec(1) + yVec(2));
+
+        % 中間 i=2 〜 N-2
+        for i = 2:N-2
+            yNewVec(i) = yVec(i) + r * (yVec(i-1) - 2*yVec(i) + yVec(i+1));
+        end
+
+        % 右端（内部点の最後）i=N-1
+        yNewVec(N-1) = yVec(N-1) + r * (yVec(N-2) - 2*yVec(N-1));
+
+        % 更新
+        yVec = yNewVec;
+    end
+
+    % 境界を加えた最終近似解を返す
+    approxSol = [0, yVec, 0];   % 端点0を加える
+end
